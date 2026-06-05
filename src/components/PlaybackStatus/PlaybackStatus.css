@@ -1,0 +1,16 @@
+.playback-status {
+  width: 100%;
+  margin: 0;
+  padding: 0 0.75rem 0.5rem;
+  font-size: 0.85rem;
+  min-height: 1.2em;
+  box-sizing: border-box;
+}
+
+.playback-status--ok {
+  color: #9cdc9c;
+}
+
+.playback-status--error {
+  color: #f08080;
+}

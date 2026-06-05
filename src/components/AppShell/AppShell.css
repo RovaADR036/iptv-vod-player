@@ -1,0 +1,17 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #000;
+  color: #eee;
+}
+
+.app-shell__header {
+  flex-shrink: 0;
+}
+
+.app-shell__main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
