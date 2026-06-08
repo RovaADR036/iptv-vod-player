@@ -9,6 +9,13 @@ export function collectOriginsFromPlaylistText(text) {
       /* ignore */
     }
   }
+  for (const m of text.matchAll(/\/redirect\?url=([^&\s"'#]+)/gi)) {
+    try {
+      origins.push(new URL(decodeURIComponent(m[1])).origin);
+    } catch {
+      /* ignore */
+    }
+  }
   return origins;
 }
 
@@ -30,7 +37,9 @@ export function parsePlaylistForCdn(text, proxyBase) {
 
   for (const line of text.split(/\r?\n/)) {
     const t = line.trim();
-    const embedded = t.match(/\/proxy\?url=([^&\s"'#]+)/i);
+    const embedded =
+      t.match(/\/proxy\?url=([^&\s"'#]+)/i) ||
+      t.match(/\/redirect\?url=([^&\s"'#]+)/i);
     if (!embedded) continue;
 
     try {

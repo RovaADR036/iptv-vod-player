@@ -13,8 +13,17 @@ export default function App() {
   const videoRef = useRef(null);
   const initialLoadDone = useRef(false);
 
-  const { settings, useProxy, proxyBase, toggleProxy, updateProxyBase } =
-    useProxySettings();
+  const {
+    settings,
+    useProxy,
+    proxyMode,
+    proxyBase,
+    providerSlug,
+    toggleProxy,
+    updateProxyBase,
+    updateProxyMode,
+    updateProviderSlug,
+  } = useProxySettings();
   const { streamUrl, setStreamUrl, syncToAddressBar } = useStreamUrlQuery();
   const { message, isError, setStatus } = usePlaybackStatus();
 
@@ -50,8 +59,12 @@ export default function App() {
           onSubmit={handleSubmit}
           useProxy={useProxy}
           onUseProxyChange={toggleProxy}
+          proxyMode={proxyMode}
+          onProxyModeChange={updateProxyMode}
           proxyBase={proxyBase}
           onProxyBaseChange={updateProxyBase}
+          providerSlug={providerSlug}
+          onProviderSlugChange={updateProviderSlug}
         />
       }
       status={<PlaybackStatus message={message} isError={isError} />}

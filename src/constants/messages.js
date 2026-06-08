@@ -20,7 +20,13 @@ export const STATUS = {
     cdn ? `Flux HLS prêt (CDN : ${cdn}).` : "Flux HLS prêt.",
   playerNotReady: "Lecteur non prêt.",
   cdnNotFound:
-    "CDN du flux non détecté — relancez npm run proxy puis rechargez la page (Ctrl+F5).",
+    "CDN du flux non détecté — vérifiez que le proxy tourne (npm run proxy ou docker compose up) puis rechargez (Ctrl+F5).",
+  proxyUnreachable:
+    "Proxy injoignable — lancez allmovies (docker compose up) ou le proxy local (npm run proxy).",
+  proxyGenericDisabled:
+    "Le mode générique allmovies est désactivé — définissez GENERIC_PROXY_ENABLED=true puis reconstruisez le conteneur.",
+  providerNotConfigured:
+    "Fournisseur introuvable — configurez-le dans l'admin allmovies (http://localhost:3211) avec le même slug.",
   hlsUnsupported:
     "HLS (.m3u8) non supporté ici. Utilisez Chrome/Edge/Firefox avec hls.js ou Safari.",
 };

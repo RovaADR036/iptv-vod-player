@@ -1,19 +1,28 @@
 # IPTV VOD Player
 
-Lecteur web React pour tester des flux vidéo IPTV : **MP4**, **M3U8 (HLS)** et redirections CDN. Le proxy Node (`stream-proxy.mjs`) est requis pour les liens IPTV typiques.
+Lecteur web React pour tester des flux vidéo IPTV : **MP4**, **M3U8 (HLS)** et redirections CDN.
+
+Trois modes proxy sont disponibles dans l’interface :
+
+| Mode | Proxy | Usage |
+|------|-------|-------|
+| **Proxy local (3080)** | `stream-proxy.mjs` | Test rapide, une URL collée telle quelle |
+| **Allmovies générique (3210)** | `allmovies-iptv-proxy` route `/proxy?url=` | Même UX que le proxy local, via Docker |
+| **Allmovies fournisseur (3210)** | Routes `/proxy/{slug}/movie/...` | Fournisseur configuré dans l’admin Redis |
 
 ## Prérequis
 
 - [Node.js](https://nodejs.org/) 18+
+- Pour les modes Allmovies : [Docker](https://www.docker.com/) (projet `allmovies-iptv-proxy` voisin)
 
 ## Installation
 
 ```bash
-cd C:\dev\iptv-vod-player
+cd iptv-vod-player
 npm install
 ```
 
-## Démarrage
+## Démarrage — mode proxy local
 
 **Terminal 1 — proxy :**
 
@@ -27,12 +36,35 @@ npm run proxy
 npm run dev
 ```
 
-Ouvrir **http://localhost:5173/**
+Ouvrir **http://localhost:5173/** — sélectionner **Proxy local (3080)**.
+
+## Démarrage — modes Allmovies
+
+**Terminal 1 — stack allmovies :**
+
+```bash
+cd ../allmovies-iptv-proxy
+docker compose up
+```
+
+Vérifier que `.env` contient `GENERIC_PROXY_ENABLED=true` (activé par défaut).
+
+**Terminal 2 — lecteur :**
+
+```bash
+cd iptv-vod-player
+npm run dev
+```
+
+Dans l’interface :
+
+- **Allmovies générique** : coller l’URL IPTV complète (`http://line.../movie/.../film.m3u8`)
+- **Allmovies fournisseur** : même URL ; le lecteur la convertit en `/proxy/{slug}/movie/...`. Configurer le fournisseur dans l’admin (`http://localhost:3211`) et aligner `src/config/providers.js`.
 
 ## Utilisation
 
-1. Coller l’URL du flux (ex. `http://line.example/.../film.m3u8`)
-2. Laisser **Via proxy local** coché (`http://127.0.0.1:3080`)
+1. Coller l’URL du flux
+2. Cocher **Via proxy** et choisir le mode
 3. Cliquer **Tester**
 
 ## Formats
@@ -56,13 +88,14 @@ Ouvrir **http://localhost:5173/**
 
 ```
 iptv-vod-player/
-├── src/                 # Application React
+├── src/
 │   ├── components/      # UI
+│   ├── config/          # defaults, providers (miroir admin allmovies)
 │   ├── hooks/           # État React
 │   ├── services/        # Lecture vidéo, HLS, CDN
-│   └── utils/           # Fonctions pures
-├── stream-proxy.mjs     # Proxy Node (partagé)
-├── docs/                # Documentation
+│   └── utils/           # proxyUrl, iptvUrlParser, …
+├── stream-proxy.mjs     # Proxy Node autonome (mode local)
+├── docs/
 └── package.json
 ```
 

@@ -78,8 +78,44 @@ En une phrase : le proxy n’est pas un luxe pour accélérer le flux — c’es
 
 ---
 
+## Modes proxy dans le lecteur
+
+### Proxy local (`stream-proxy.mjs`, port 3080)
+
+Comportement d’origine : `GET /proxy?url=...`, réécriture m3u8, relais `/hls/...`.
+
+```bash
+npm run proxy
+```
+
+### Allmovies générique (`allmovies-iptv-proxy`, port 3210)
+
+Même API `/proxy?url=...` exposée par le handler générique (`GENERIC_PROXY_ENABLED=true`). Les segments de secours passent par `/passthrough/hls/*` pour ne pas entrer en conflit avec les routes fournisseur `/hls/{slug}/...`.
+
+```bash
+cd ../allmovies-iptv-proxy && docker compose up
+```
+
+Dans le lecteur : mode **Allmovies générique (3210)**, base `http://localhost:3210`.
+
+### Allmovies fournisseur (port 3210)
+
+Le lecteur parse l’URL collée et appelle `/proxy/{slug}/movie/...` (ou `/live/`, `/series/`). Allmovies gère la session Redis et réécrit les playlists vers `/hls/{slug}/{sessionKey}/...`.
+
+Prérequis :
+
+1. Fournisseur créé dans l’admin allmovies (`http://localhost:3211`) avec `upstreamBase`, `pathTemplate`, `vodPathTemplate`, `segmentRewrite`
+2. Entrée correspondante dans `src/config/providers.js` (mapping hôte → slug)
+
+La découverte CDN côté navigateur est **désactivée** dans ce mode : le proxy allmovies gère déjà les redirections.
+
+---
+
 ## Fichiers liés
 
-- `stream-proxy.mjs` — implémentation du proxy (redirections, réécriture m3u8, SSL, relais `/hls/...`)
-- `src/` — application React ; option « Via proxy local » et intégration hls.js
-- `README.md` — démarrage rapide et tableau des formats supportés
+- `stream-proxy.mjs` — proxy autonome (mode local)
+- `../allmovies-iptv-proxy/proxy/lib/handlers/generic-url-handler.js` — passthrough générique pour le mode Allmovies
+- `src/config/providers.js` — miroir des fournisseurs admin
+- `src/utils/iptvUrlParser.js` — conversion URL IPTV → route fournisseur
+- `src/` — application React ; sélecteur de mode proxy et hls.js
+- `README.md` — démarrage rapide

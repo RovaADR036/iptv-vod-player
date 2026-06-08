@@ -47,6 +47,29 @@
   cursor: pointer;
 }
 
+.stream-test-bar__proxy-mode,
+.stream-test-bar__provider-slug {
+  flex: 0 1 auto;
+  min-width: 10rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: #0d0d0d;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.stream-test-bar__provider-slug {
+  min-width: 6rem;
+  flex: 0 1 7rem;
+}
+
+.stream-test-bar__proxy-mode:focus,
+.stream-test-bar__provider-slug:focus {
+  outline: 2px solid #5b9bd5;
+  border-color: #5b9bd5;
+}
+
 .stream-test-bar__proxy-base {
   flex: 0 1 10rem;
   min-width: 8rem;
