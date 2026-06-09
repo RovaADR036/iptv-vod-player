@@ -88,13 +88,23 @@ Dans l’interface :
 
 ```
 iptv-vod-player/
+├── proxy-server/        # Proxy local modulaire (port 3080)
+│   ├── handlers.js      # Routage HTTP
+│   ├── upstream-pipe.js # Relais upstream + réécriture m3u8
+│   └── create-server.js # Factory serveur
 ├── src/
-│   ├── components/      # UI
-│   ├── config/          # defaults, providers (miroir admin allmovies)
-│   ├── hooks/           # État React
-│   ├── services/        # Lecture vidéo, HLS, CDN
-│   └── utils/           # proxyUrl, iptvUrlParser, …
-├── stream-proxy.mjs     # Proxy Node autonome (mode local)
+│   ├── components/      # UI React
+│   ├── config/          # Constantes, modes proxy, fournisseurs
+│   ├── hooks/           # État React (proxy, lecture, URL)
+│   ├── proxy/           # Intégration proxy côté client
+│   │   ├── hosts/       # Détection hôtes IPTV / routes allmovies
+│   │   ├── parsers/     # Parsing URL fournisseur
+│   │   ├── cdn/         # Analyse playlists m3u8
+│   │   └── hls/         # Résolution URLs HLS par mode
+│   ├── playback/        # Moteur de lecture (engine, HLS, MP4)
+│   ├── services/        # Re-exports rétrocompatibles
+│   └── utils/           # Utilitaires purs (proxyUrl, streamFormat)
+├── stream-proxy.mjs     # Point d'entrée proxy local
 ├── docs/
 └── package.json
 ```
