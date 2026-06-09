@@ -15,4 +15,9 @@ export const PlaybackEvent = {
   HLS_UNSUPPORTED: "hls_unsupported",
   VIDEO_ELEMENT_ERROR: "video_element_error",
   HLS_FATAL_ERROR: "hls_fatal_error",
+  BUFFERING: "buffering",
+  BUFFER_RESUMED: "buffer_resumed",
+  HLS_RECOVERING_NETWORK: "hls_recovering_network",
+  HLS_RECOVERING_MEDIA: "hls_recovering_media",
+  HLS_RECOVERY_FAILED: "hls_recovery_failed",
 };

@@ -1,8 +1,7 @@
-import { HLS_CONFIG } from "../../config/defaults.js";
-import { PlaybackEvent } from "../../domain/playback/events.js";
-import { describeHlsFatalError } from "./errorFormatter.js";
-import { Hls } from "./native.js";
+import { HLS_RESILIENT_CONFIG } from "../../config/hlsPlayback.js";
 import { createProxyLoader } from "./proxyLoader.js";
+import { Hls } from "./native.js";
+import { wirePlaybackEvents } from "./wirePlaybackEvents.js";
 
 export function attachHlsPlayer({
   video,
@@ -12,7 +11,7 @@ export function attachHlsPlayer({
   cdnOrigin,
 }) {
   const ProxyLoader = createProxyLoader(fixHlsRequestUrl);
-  const hlsOpts = { ...HLS_CONFIG };
+  const hlsOpts = { ...HLS_RESILIENT_CONFIG };
 
   if (ProxyLoader) {
     hlsOpts.loader = ProxyLoader;
@@ -22,19 +21,10 @@ export function attachHlsPlayer({
 
   const hls = new Hls(hlsOpts);
 
-  hls.on(Hls.Events.ERROR, (_, data) => {
-    if (!data.fatal) return;
-    const { event, context } = describeHlsFatalError(data);
-    report(event, context);
-  });
-
-  hls.on(Hls.Events.MANIFEST_PARSED, () => {
-    report(PlaybackEvent.HLS_READY, { cdnOrigin });
-    video.play().catch(() => {});
-  });
+  const detach = wirePlaybackEvents(hls, { video, report, cdnOrigin });
 
   hls.loadSource(fixHlsRequestUrl(playUrl));
   hls.attachMedia(video);
 
-  return hls;
+  return { instance: hls, detach };
 }

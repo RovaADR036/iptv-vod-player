@@ -30,7 +30,8 @@ export function createPlaybackEngine() {
   function teardown() {
     disableHlsXhrPatch();
     if (hlsInstance) {
-      hlsInstance.destroy();
+      hlsInstance.detach?.();
+      hlsInstance.instance?.destroy();
       hlsInstance = null;
     }
     cdnOrigin = null;

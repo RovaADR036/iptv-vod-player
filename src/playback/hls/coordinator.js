@@ -40,7 +40,7 @@ export async function loadHlsStream({
   setCdnOrigin(cdnOrigin);
   enableHlsXhrPatch(urlResolver.fixHlsRequestUrl);
 
-  const hls = attachHlsPlayer({
+  const { instance, detach } = attachHlsPlayer({
     video,
     playUrl,
     fixHlsRequestUrl: urlResolver.fixHlsRequestUrl,
@@ -48,6 +48,6 @@ export async function loadHlsStream({
     cdnOrigin,
   });
 
-  setHlsInstance(hls);
+  setHlsInstance({ instance, detach });
   return true;
 }

@@ -10,6 +10,23 @@ const VIDEO_ERROR_MESSAGES = {
 const SSL_PROXY_HINT =
   " Le flux est redirigé vers un CDN HTTPS (dvodcdn.xyz) dont le SSL est refusé par le navigateur — activez « Via proxy » et lancez docker compose up (allmovies-iptv-proxy).";
 
+function formatHlsErrorMessage(context) {
+  const msg = context.details || context.type || "erreur HLS";
+  const rawFrag = context.fragUrl || "";
+  const frag = rawFrag
+    ? ` Segment : ${String(rawFrag).slice(0, 140)}…`
+    : "";
+  let hint = context.hint || "";
+  if (!hint && context.details === "fragParsingError") {
+    hint = " (segment invalide ou format non TS)";
+  }
+  if (rawFrag.includes("/hls/") && !rawFrag.includes("/proxy?url=")) {
+    hint +=
+      " — rechargez la page après docker compose up (correctif CDN en cours)";
+  }
+  return { message: `Erreur HLS : ${msg}${hint}.${frag}`, isError: true };
+}
+
 /**
  * @param {string} event
  * @param {Record<string, unknown>} [context]
@@ -75,25 +92,17 @@ export function formatPlaybackMessage(event, context = {}) {
       const sslHint = context.sslLikely ? SSL_PROXY_HINT : "";
       return { message: base + detail + sslHint, isError: true };
     }
-    case PlaybackEvent.HLS_FATAL_ERROR: {
-      const msg = context.details || context.type || "erreur HLS";
-      const rawFrag = context.fragUrl || "";
-      const frag = rawFrag
-        ? ` Segment : ${String(rawFrag).slice(0, 140)}…`
-        : "";
-      let hint = context.hint || "";
-      if (!hint && context.details === "fragParsingError") {
-        hint = " (segment invalide ou format non TS)";
-      }
-      if (
-        rawFrag.includes("/hls/") &&
-        !rawFrag.includes("/proxy?url=")
-      ) {
-        hint +=
-          " — rechargez la page après docker compose up (correctif CDN en cours)";
-      }
-      return { message: `Erreur HLS : ${msg}${hint}.${frag}`, isError: true };
-    }
+    case PlaybackEvent.BUFFERING:
+      return { message: "Mise en mémoire tampon…", isError: false };
+    case PlaybackEvent.BUFFER_RESUMED:
+      return { message: "Lecture reprise.", isError: false };
+    case PlaybackEvent.HLS_RECOVERING_NETWORK:
+      return { message: "Reconnexion au flux…", isError: false };
+    case PlaybackEvent.HLS_RECOVERING_MEDIA:
+      return { message: "Récupération du décodage…", isError: false };
+    case PlaybackEvent.HLS_FATAL_ERROR:
+    case PlaybackEvent.HLS_RECOVERY_FAILED:
+      return formatHlsErrorMessage(context);
     default:
       return { message: "", isError: false };
   }

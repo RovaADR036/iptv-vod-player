@@ -10,12 +10,6 @@ export const PROXY_MODE_BASE = {
   [PROXY_MODE.ALLMOVIES_PROVIDER]: DEFAULT_PROXY_BASE,
 };
 
-export const HLS_CONFIG = {
-  enableWorker: true,
-  lowLatencyMode: false,
-  enableSoftwareAES: true,
-  maxBufferLength: 30,
-  fragLoadingMaxRetry: 4,
-};
+export { HLS_CONFIG, HLS_RESILIENT_CONFIG } from "./hlsPlayback.js";
 
 export const CDN_DISCOVERY_MAX_DEPTH = 3;
