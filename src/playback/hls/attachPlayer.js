@@ -1,6 +1,6 @@
 import { HLS_CONFIG } from "../../config/defaults.js";
-import { STATUS } from "../../constants/messages.js";
-import { formatHlsFatalError } from "./errorFormatter.js";
+import { PlaybackEvent } from "../../domain/playback/events.js";
+import { describeHlsFatalError } from "./errorFormatter.js";
 import { Hls } from "./native.js";
 import { createProxyLoader } from "./proxyLoader.js";
 
@@ -8,7 +8,7 @@ export function attachHlsPlayer({
   video,
   playUrl,
   fixHlsRequestUrl,
-  onStatus,
+  report,
   cdnOrigin,
 }) {
   const ProxyLoader = createProxyLoader(fixHlsRequestUrl);
@@ -24,11 +24,12 @@ export function attachHlsPlayer({
 
   hls.on(Hls.Events.ERROR, (_, data) => {
     if (!data.fatal) return;
-    onStatus(formatHlsFatalError(data), true);
+    const { event, context } = describeHlsFatalError(data);
+    report(event, context);
   });
 
   hls.on(Hls.Events.MANIFEST_PARSED, () => {
-    onStatus(STATUS.hlsReady(cdnOrigin), false);
+    report(PlaybackEvent.HLS_READY, { cdnOrigin });
     video.play().catch(() => {});
   });
 

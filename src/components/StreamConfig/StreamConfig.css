@@ -1,0 +1,151 @@
+.stream-config {
+  position: absolute;
+  top: max(0.5rem, env(safe-area-inset-top, 0));
+  left: max(0.5rem, env(safe-area-inset-left, 0));
+  z-index: 60;
+}
+
+.stream-config__toggle {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 0.45rem;
+  background: rgb(0 0 0 / 0.72);
+  color: #eee;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.35);
+}
+
+.stream-config__toggle:hover {
+  background: rgb(20 20 20 / 0.92);
+  border-color: rgb(255 255 255 / 0.3);
+}
+
+.stream-config--open .stream-config__toggle {
+  border-color: #5b9bd5;
+  background: rgb(30 40 50 / 0.95);
+}
+
+.stream-config--error .stream-config__toggle {
+  border-color: #c55;
+}
+
+.stream-config__toggle-icon {
+  display: block;
+  transform-origin: center;
+  transition: transform 150ms ease-out;
+}
+
+.stream-config--open .stream-config__toggle-icon {
+  transform: rotate(90deg);
+}
+
+.stream-config__panel {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  width: min(18rem, calc(100vw - 1.5rem));
+  max-height: min(70dvh, 26rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.75rem;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 0.55rem;
+  background: rgb(18 18 18 / 0.96);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.5);
+  backdrop-filter: blur(14px);
+}
+
+.stream-config__title {
+  margin: 0 0 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #aaa;
+}
+
+.stream-config-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.stream-config-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.stream-config-form__field--row {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.stream-config-form__field--row input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+}
+
+.stream-config-form__label {
+  font-size: 0.72rem;
+  color: #999;
+}
+
+.stream-config-form__input,
+.stream-config-form__select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #444;
+  border-radius: 5px;
+  background: #0d0d0d;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.stream-config-form__input:focus,
+.stream-config-form__select:focus {
+  outline: 2px solid #5b9bd5;
+  border-color: #5b9bd5;
+}
+
+.stream-config-form__select:disabled,
+.stream-config-form__input:disabled {
+  opacity: 0.55;
+}
+
+.stream-config-form__submit {
+  margin-top: 0.15rem;
+  min-height: 2.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  background: #5b9bd5;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.stream-config-form__submit:hover {
+  background: #4a8ac4;
+}
+
+.stream-config__panel .playback-status {
+  margin-top: 0.6rem;
+  padding: 0.45rem 0 0;
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+  font-size: 0.78rem;
+}

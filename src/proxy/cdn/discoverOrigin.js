@@ -1,7 +1,7 @@
-import { CDN_DISCOVERY_MAX_DEPTH } from "../config/defaults.js";
-import { parsePlaylistForCdn } from "../proxy/cdn/playlistParser.js";
-import { isLineIptvOrigin } from "../proxy/hosts/lineIptv.js";
-import { normalizeProxyBase } from "../utils/proxyUrl.js";
+import { CDN_DISCOVERY_MAX_DEPTH } from "../../config/defaults.js";
+import { parsePlaylistForCdn } from "./playlistParser.js";
+import { isLineIptvOrigin } from "../hosts/lineIptv.js";
+import { normalizeProxyBase } from "../../utils/proxyUrl.js";
 
 export async function discoverCdnOrigin(playUrl, proxyBase, depth = 0) {
   if (depth > CDN_DISCOVERY_MAX_DEPTH) return null;

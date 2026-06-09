@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef } from "react";
+import { PlaybackEvent } from "../domain/playback/events.js";
 import { createPlaybackEngine } from "../playback/engine.js";
 
 export function usePlaybackController({
   videoRef,
   proxySettings,
-  setStatus,
+  report,
   syncToAddressBar,
 }) {
   const engineRef = useRef(null);
@@ -22,7 +23,7 @@ export function usePlaybackController({
     async (rawUrl) => {
       const video = videoRef.current;
       if (!video) {
-        setStatus("Lecteur non prêt.", true);
+        report(PlaybackEvent.PLAYER_NOT_READY);
         return;
       }
 
@@ -32,10 +33,10 @@ export function usePlaybackController({
         video,
         rawUrl,
         proxySettings,
-        onStatus: setStatus,
+        report,
       });
     },
-    [videoRef, proxySettings, setStatus, syncToAddressBar]
+    [videoRef, proxySettings, report, syncToAddressBar]
   );
 
   return { loadStream };

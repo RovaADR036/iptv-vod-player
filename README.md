@@ -74,16 +74,17 @@ Dans l’interface :
 ```
 iptv-vod-player/
 ├── src/
-│   ├── components/      # UI React
+│   ├── components/      # UI React (AppShell, StreamConfig, VideoSurface…)
 │   ├── config/          # Constantes, modes proxy, fournisseurs
-│   ├── hooks/           # État React (proxy, lecture, URL)
-│   ├── proxy/           # Intégration proxy côté client
+│   ├── domain/          # Codes métier (événements de lecture)
+│   ├── hooks/           # État et composition React
+│   ├── i18n/            # Textes UI (formatage des messages)
+│   ├── proxy/           # Résolution d’URL, santé proxy, CDN
 │   │   ├── hosts/       # Détection hôtes IPTV / routes allmovies
 │   │   ├── parsers/     # Parsing URL fournisseur
-│   │   ├── cdn/         # Analyse playlists m3u8
+│   │   ├── cdn/         # Analyse playlists m3u8, découverte CDN
 │   │   └── hls/         # Résolution URLs HLS par mode
 │   ├── playback/        # Moteur de lecture (engine, HLS, MP4)
-│   ├── services/        # Re-exports rétrocompatibles
 │   └── utils/           # Utilitaires purs (proxyUrl, streamFormat)
 ├── docs/
 └── package.json

@@ -1,17 +1,25 @@
-export function formatHlsFatalError(data) {
-  const msg = data.details || data.type || "erreur HLS";
-  const rawFrag = data.frag?.url || "";
-  const frag = rawFrag ? ` Segment : ${rawFrag.slice(0, 140)}…` : "";
+import { PlaybackEvent } from "../../domain/playback/events.js";
 
-  let hint =
-    data.details === "fragParsingError"
-      ? " (segment invalide ou format non TS)"
-      : "";
+/**
+ * @param {import("hls.js").ErrorData} data
+ * @returns {{ event: string, context: Record<string, unknown> }}
+ */
+export function describeHlsFatalError(data) {
+  const fragUrl = data.frag?.url || "";
+  let hint = "";
 
-  if (rawFrag.includes("/hls/") && !rawFrag.includes("/proxy?url=")) {
-    hint +=
+  if (fragUrl.includes("/hls/") && !fragUrl.includes("/proxy?url=")) {
+    hint =
       " — rechargez la page après docker compose up (correctif CDN en cours)";
   }
 
-  return `Erreur HLS : ${msg}${hint}.${frag}`;
+  return {
+    event: PlaybackEvent.HLS_FATAL_ERROR,
+    context: {
+      details: data.details,
+      type: data.type,
+      fragUrl,
+      hint,
+    },
+  };
 }

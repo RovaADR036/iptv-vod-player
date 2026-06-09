@@ -1,7 +1,7 @@
-import { STATUS } from "../../constants/messages.js";
+import { PlaybackEvent } from "../../domain/playback/events.js";
+import { discoverCdnOrigin } from "../../proxy/cdn/discoverOrigin.js";
 import { requiresCdnDiscovery } from "../../proxy/modePolicy.js";
 import { isLineIptvOrigin } from "../../proxy/hosts/lineIptv.js";
-import { discoverCdnOrigin } from "../cdnDiscovery.js";
 import { attachHlsPlayer } from "./attachPlayer.js";
 import { isHlsSupported, loadNativeHls } from "./native.js";
 import { enableHlsXhrPatch } from "./xhrPatch.js";
@@ -12,27 +12,27 @@ export async function loadHlsStream({
   proxied,
   proxySettings,
   urlResolver,
-  onStatus,
+  report,
   setCdnOrigin,
   setHlsInstance,
 }) {
   if (!isHlsSupported()) {
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       await loadNativeHls(video, playUrl);
-      onStatus(STATUS.hlsReady(null), false);
+      report(PlaybackEvent.HLS_READY, { cdnOrigin: null });
       return true;
     }
-    onStatus(STATUS.hlsUnsupported, true);
+    report(PlaybackEvent.HLS_UNSUPPORTED);
     return false;
   }
 
   let cdnOrigin = null;
 
   if (requiresCdnDiscovery(proxySettings.proxyMode, proxied)) {
-    onStatus(STATUS.analyzingCdn, false);
+    report(PlaybackEvent.ANALYZING_CDN);
     cdnOrigin = await discoverCdnOrigin(playUrl, proxySettings.proxyBase);
     if (!cdnOrigin || isLineIptvOrigin(cdnOrigin)) {
-      onStatus(STATUS.cdnNotFound, true);
+      report(PlaybackEvent.CDN_NOT_FOUND);
       return false;
     }
   }
@@ -44,7 +44,7 @@ export async function loadHlsStream({
     video,
     playUrl,
     fixHlsRequestUrl: urlResolver.fixHlsRequestUrl,
-    onStatus,
+    report,
     cdnOrigin,
   });
 

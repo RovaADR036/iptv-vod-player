@@ -1,29 +1,18 @@
 import { useEffect } from "react";
-import {
-  SSL_PROXY_HINT,
-  STATUS,
-  VIDEO_ERROR_MESSAGES,
-} from "../constants/messages.js";
+import { PlaybackEvent } from "../domain/playback/events.js";
+import { describeVideoElementError } from "../playback/videoElementErrors.js";
 
-export function useVideoElementErrors(videoRef, { useProxy, onStatus }) {
+export function useVideoElementErrors(videoRef, { useProxy, report }) {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const onError = () => {
-      const code = video.error?.code;
-      const base = code
-        ? VIDEO_ERROR_MESSAGES[code]
-        : "Erreur de lecture.";
-      const detail = video.error?.message ? ` (${video.error.message})` : "";
-      const src = video.currentSrc || video.src || "";
-      const sslLikely =
-        !useProxy &&
-        (src.includes("dvodcdn.xyz") || detail.includes("Format error"));
-      onStatus(base + detail + (sslLikely ? SSL_PROXY_HINT : ""), true);
+      const { event, context } = describeVideoElementError(video, { useProxy });
+      report(event, context);
     };
 
-    const onLoadedData = () => onStatus(STATUS.ready, false);
+    const onLoadedData = () => report(PlaybackEvent.READY);
 
     video.addEventListener("error", onError);
     video.addEventListener("loadeddata", onLoadedData);
@@ -32,5 +21,5 @@ export function useVideoElementErrors(videoRef, { useProxy, onStatus }) {
       video.removeEventListener("error", onError);
       video.removeEventListener("loadeddata", onLoadedData);
     };
-  }, [videoRef, useProxy, onStatus]);
+  }, [videoRef, useProxy, report]);
 }

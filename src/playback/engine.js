@@ -1,3 +1,4 @@
+import { PlaybackEvent } from "../domain/playback/events.js";
 import { createHlsUrlResolver } from "../proxy/hls/createResolver.js";
 import { requiresHealthCheck } from "../proxy/modePolicy.js";
 import { resolvePlayUrl } from "../proxy/playUrlResolver.js";
@@ -5,8 +6,13 @@ import { validateProxyForMode } from "../proxy/proxyHealth.js";
 import { isHlsUrl } from "../utils/streamFormat.js";
 import { loadHlsStream } from "./hls/coordinator.js";
 import { disableHlsXhrPatch } from "./hls/xhrPatch.js";
-import { getLoadingStatus } from "./loadingStatus.js";
+import { getLoadingPhase } from "./status/loadingPhase.js";
 import { loadProgressiveStream } from "./progressive.js";
+
+const PROXY_HEALTH_EVENTS = {
+  unreachable: PlaybackEvent.PROXY_UNREACHABLE,
+  "generic-disabled": PlaybackEvent.PROXY_GENERIC_DISABLED,
+};
 
 /**
  * Orchestrateur de lecture — coordonne proxy, HLS et flux progressif.
@@ -36,16 +42,18 @@ export function createPlaybackEngine() {
     video.load();
   }
 
-  async function load({ video, rawUrl, proxySettings, onStatus }) {
+  async function load({ video, rawUrl, proxySettings, report }) {
     const trimmed = rawUrl.trim();
     if (!trimmed) return;
 
     proxySettingsRef = proxySettings;
 
     if (proxySettings.useProxy && requiresHealthCheck(proxySettings.proxyMode)) {
-      const errorMessage = await validateProxyForMode(proxySettings);
-      if (errorMessage) {
-        onStatus(errorMessage, true);
+      const health = await validateProxyForMode(proxySettings);
+      if (!health.ok) {
+        const event =
+          PROXY_HEALTH_EVENTS[health.reason] ?? PlaybackEvent.PROXY_UNREACHABLE;
+        report(event);
         return;
       }
     }
@@ -54,7 +62,7 @@ export function createPlaybackEngine() {
     const proxied = playUrl !== trimmed;
     const hls = isHlsUrl(trimmed);
 
-    onStatus(getLoadingStatus(hls, proxied), false);
+    report(getLoadingPhase(hls, proxied));
     resetVideoElement(video);
 
     if (hls) {
@@ -64,9 +72,13 @@ export function createPlaybackEngine() {
         proxied,
         proxySettings,
         urlResolver,
-        onStatus,
-        setCdnOrigin: (origin) => { cdnOrigin = origin; },
-        setHlsInstance: (instance) => { hlsInstance = instance; },
+        report,
+        setCdnOrigin: (origin) => {
+          cdnOrigin = origin;
+        },
+        setHlsInstance: (instance) => {
+          hlsInstance = instance;
+        },
       });
       return;
     }

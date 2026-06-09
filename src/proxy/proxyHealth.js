@@ -1,5 +1,4 @@
 import { PROXY_MODE } from "../config/defaults.js";
-import { STATUS } from "../constants/messages.js";
 import { normalizeProxyBase } from "../utils/proxyUrl.js";
 
 export async function checkProxyHealth(proxyBase) {
@@ -22,26 +21,21 @@ export async function checkProxyHealth(proxyBase) {
   }
 }
 
-const HEALTH_ERROR_STATUS = {
-  unreachable: STATUS.proxyUnreachable,
-  "generic-disabled": STATUS.proxyGenericDisabled,
-};
-
 /**
  * Valide que le proxy est prêt pour le mode demandé.
- * Retourne null si OK, sinon le message d'erreur à afficher.
+ * @returns {Promise<{ ok: true } | { ok: false, reason: string }>}
  */
 export async function validateProxyForMode(proxySettings) {
   const health = await checkProxyHealth(proxySettings.proxyBase);
 
-  if (health.ok) return null;
+  if (health.ok) return { ok: true };
 
   if (
     health.reason === "generic-disabled" &&
     proxySettings.proxyMode !== PROXY_MODE.ALLMOVIES_GENERIC
   ) {
-    return null;
+    return { ok: true };
   }
 
-  return HEALTH_ERROR_STATUS[health.reason] ?? STATUS.proxyUnreachable;
+  return { ok: false, reason: health.reason };
 }
