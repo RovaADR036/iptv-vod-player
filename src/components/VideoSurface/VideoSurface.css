@@ -1,20 +1,71 @@
-.video-surface {
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-  background: #000;
-  display: flex;
-}
-
-.video-surface__player {
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-  --media-border-radius: 0;
-}
-
-.video-surface__video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+.video-surface {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  background: #000;
+  display: flex;
+}
+
+.video-surface__player {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  --media-border-radius: 0;
+  --media-video-border-radius: 0;
+}
+
+.video-surface__video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Lecteur : marges et contrôles sur petits écrans */
+.video-surface__player.media-default-skin--video .media-controls {
+  inset-inline: max(0.35rem, env(safe-area-inset-left, 0))
+    max(0.35rem, env(safe-area-inset-right, 0));
+  bottom: max(0.35rem, env(safe-area-inset-bottom, 0));
+}
+
+@container media-root (width < 26rem) {
+  .video-surface__player {
+    --media-icon-size: 16px;
+  }
+
+  .video-surface__player .media-button--icon {
+    width: 2rem;
+  }
+
+  .video-surface__player .media-button--cast,
+  .video-surface__player .media-button--seek .media-icon__label {
+    display: none;
+  }
+
+  .video-surface__player .media-time-controls {
+    gap: 0.5rem;
+    padding-inline: 0.35rem;
+  }
+
+  .video-surface__player .media-time {
+    font-size: 0.72rem;
+  }
+}
+
+@container media-root (width < 20rem) {
+  .video-surface__player .media-button--seek {
+    display: none;
+  }
+
+  .video-surface__player .media-button--pip {
+    display: none;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 28rem) {
+  .video-surface__player.media-default-skin--video .media-controls {
+    inset-inline: max(0.25rem, env(safe-area-inset-left, 0))
+      max(0.25rem, env(safe-area-inset-right, 0));
+    bottom: max(0.25rem, env(safe-area-inset-bottom, 0));
+    padding: 0.2rem;
+  }
+}

@@ -31,7 +31,8 @@
 }
 
 .media-menu--language {
-  min-width: 14rem;
+  min-width: min(14rem, calc(100vw - 2rem));
+  max-width: calc(100vw - 1.5rem);
 }
 
 .media-menu__hint {
@@ -40,4 +41,20 @@
   color: var(--media-menu-hint-color, #888);
   font-size: 0.72rem;
   line-height: 1.35;
+}
+
+@container media-root (width < 26rem) {
+  .media-button--language {
+    min-width: 2rem;
+  }
+
+  .language-menu__trigger-label {
+    font-size: 0.65rem;
+  }
+
+  .language-menu__trigger-badge {
+    top: 0.05rem;
+    right: 0;
+    font-size: 0.4rem;
+  }
 }
