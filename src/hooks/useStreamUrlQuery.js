@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 const QUERY_KEY = "url";
 
+function readUrlFromQuery() {
+  return new URLSearchParams(window.location.search).get(QUERY_KEY) ?? "";
+}
+
 export function useStreamUrlQuery() {
-  const [streamUrl, setStreamUrl] = useState(() => {
-    return new URLSearchParams(window.location.search).get(QUERY_KEY) ?? "";
-  });
+  const [streamUrl, setStreamUrl] = useState(readUrlFromQuery);
 
   const syncToAddressBar = useCallback((rawUrl) => {
     const trimmed = rawUrl.trim();
@@ -18,11 +20,6 @@ export function useStreamUrlQuery() {
     const query = params.toString();
     const next = query ? `?${query}` : window.location.pathname;
     window.history.replaceState(null, "", next);
-  }, []);
-
-  useEffect(() => {
-    const fromQuery = new URLSearchParams(window.location.search).get(QUERY_KEY);
-    if (fromQuery) setStreamUrl(fromQuery);
   }, []);
 
   return { streamUrl, setStreamUrl, syncToAddressBar };
