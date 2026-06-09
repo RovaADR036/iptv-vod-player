@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { createPlaybackEngine } from "../services/playbackEngine.js";
+import { createPlaybackEngine } from "../playback/engine.js";
 
 export function usePlaybackController({
   videoRef,
@@ -9,7 +9,7 @@ export function usePlaybackController({
 }) {
   const engineRef = useRef(null);
 
-  if (!engineRef.current) {
+  if (engineRef.current == null) {
     engineRef.current = createPlaybackEngine();
   }
 

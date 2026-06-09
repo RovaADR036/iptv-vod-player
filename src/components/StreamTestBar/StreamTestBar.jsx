@@ -1,11 +1,6 @@
 import { PROXY_MODE } from "../../config/defaults.js";
+import { PROXY_BASE_HINTS, PROXY_MODE_OPTIONS } from "../../config/proxyModes.js";
 import "./StreamTestBar.css";
-
-const PROXY_MODE_OPTIONS = [
-  { value: PROXY_MODE.LOCAL, label: "Proxy local (3080)" },
-  { value: PROXY_MODE.ALLMOVIES_GENERIC, label: "Allmovies générique (3210)" },
-  { value: PROXY_MODE.ALLMOVIES_PROVIDER, label: "Allmovies fournisseur (3210)" },
-];
 
 export function StreamTestBar({
   streamUrl,
@@ -75,11 +70,7 @@ export function StreamTestBar({
         value={proxyBase}
         onChange={(e) => onProxyBaseChange(e.target.value)}
         disabled={!useProxy}
-        title={
-          proxyMode === PROXY_MODE.LOCAL
-            ? "Lancer : npm run proxy"
-            : "Lancer : docker compose up (allmovies-iptv-proxy)"
-        }
+        title={PROXY_BASE_HINTS[proxyMode] ?? ""}
         aria-label="URL de base du proxy"
       />
     </form>
