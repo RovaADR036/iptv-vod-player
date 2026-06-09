@@ -1,0 +1,43 @@
+.media-controls-inset {
+  display: contents;
+}
+
+.language-menu__trigger-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.media-button--language {
+  position: relative;
+  min-width: 2.25rem;
+}
+
+.language-menu__trigger-badge {
+  position: absolute;
+  top: 0.15rem;
+  right: 0.1rem;
+  padding: 0.05rem 0.2rem;
+  border-radius: 0.2rem;
+  background: rgb(229 9 20 / 0.9);
+  color: #fff;
+  font-size: 0.45rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.media-menu--language {
+  min-width: 14rem;
+}
+
+.media-menu__hint {
+  margin-top: 0.35rem;
+  padding: 0.35rem 0.5rem 0.15rem;
+  color: var(--media-menu-hint-color, #888);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
