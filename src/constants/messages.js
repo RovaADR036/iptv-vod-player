@@ -6,12 +6,12 @@ export const VIDEO_ERROR_MESSAGES = {
 };
 
 export const SSL_PROXY_HINT =
-  " Le flux est redirigé vers un CDN HTTPS (dvodcdn.xyz) dont le SSL est refusé par le navigateur — activez « Via proxy local » et lancez npm run proxy.";
+  " Le flux est redirigé vers un CDN HTTPS (dvodcdn.xyz) dont le SSL est refusé par le navigateur — activez « Via proxy » et lancez docker compose up (allmovies-iptv-proxy).";
 
 export const STATUS = {
   idle: "",
   loadingDirect: "Chargement direct…",
-  loadingProxy: "Chargement via proxy local…",
+  loadingProxy: "Chargement via proxy…",
   loadingHls: "Chargement flux HLS…",
   loadingHlsProxy: "Chargement flux HLS via proxy…",
   analyzingCdn: "Analyse de la playlist (CDN)…",
@@ -20,9 +20,9 @@ export const STATUS = {
     cdn ? `Flux HLS prêt (CDN : ${cdn}).` : "Flux HLS prêt.",
   playerNotReady: "Lecteur non prêt.",
   cdnNotFound:
-    "CDN du flux non détecté — vérifiez que le proxy tourne (npm run proxy ou docker compose up) puis rechargez (Ctrl+F5).",
+    "CDN du flux non détecté — vérifiez que allmovies tourne (docker compose up) puis rechargez (Ctrl+F5).",
   proxyUnreachable:
-    "Proxy injoignable — lancez allmovies (docker compose up) ou le proxy local (npm run proxy).",
+    "Proxy injoignable — lancez allmovies (docker compose up dans allmovies-iptv-proxy).",
   proxyGenericDisabled:
     "Le mode générique allmovies est désactivé — définissez GENERIC_PROXY_ENABLED=true puis reconstruisez le conteneur.",
   providerNotConfigured:

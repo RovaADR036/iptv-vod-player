@@ -2,18 +2,17 @@
 
 Lecteur web React pour tester des flux vidéo IPTV : **MP4**, **M3U8 (HLS)** et redirections CDN.
 
-Trois modes proxy sont disponibles dans l’interface :
+Deux modes proxy sont disponibles dans l’interface (via **allmovies-iptv-proxy** sur le port 3210) :
 
 | Mode | Proxy | Usage |
 |------|-------|-------|
-| **Proxy local (3080)** | `stream-proxy.mjs` | Test rapide, une URL collée telle quelle |
-| **Allmovies générique (3210)** | `allmovies-iptv-proxy` route `/proxy?url=` | Même UX que le proxy local, via Docker |
+| **Allmovies générique (3210)** | Route `/proxy?url=` | URL IPTV collée telle quelle |
 | **Allmovies fournisseur (3210)** | Routes `/proxy/{slug}/movie/...` | Fournisseur configuré dans l’admin Redis |
 
 ## Prérequis
 
 - [Node.js](https://nodejs.org/) 18+
-- Pour les modes Allmovies : [Docker](https://www.docker.com/) (projet `allmovies-iptv-proxy` voisin)
+- [Docker](https://www.docker.com/) — projet `allmovies-iptv-proxy` voisin
 
 ## Installation
 
@@ -22,23 +21,7 @@ cd iptv-vod-player
 npm install
 ```
 
-## Démarrage — mode proxy local
-
-**Terminal 1 — proxy :**
-
-```bash
-npm run proxy
-```
-
-**Terminal 2 — application React :**
-
-```bash
-npm run dev
-```
-
-Ouvrir **http://localhost:5173/** — sélectionner **Proxy local (3080)**.
-
-## Démarrage — modes Allmovies
+## Démarrage
 
 **Terminal 1 — stack allmovies :**
 
@@ -55,6 +38,8 @@ Vérifier que `.env` contient `GENERIC_PROXY_ENABLED=true` (activé par défaut)
 cd iptv-vod-player
 npm run dev
 ```
+
+Ouvrir **http://localhost:5173/**.
 
 Dans l’interface :
 
@@ -79,19 +64,15 @@ Dans l’interface :
 
 | Commande | Description |
 |----------|-------------|
-| `npm run proxy` | Lance le proxy flux sur le port 3080 |
 | `npm run dev` | Lance Vite (développement) |
 | `npm run build` | Build production |
 | `npm run preview` | Prévisualise le build |
+| `npm run lint` | Vérification ESLint |
 
 ## Structure
 
 ```
 iptv-vod-player/
-├── proxy-server/        # Proxy local modulaire (port 3080)
-│   ├── handlers.js      # Routage HTTP
-│   ├── upstream-pipe.js # Relais upstream + réécriture m3u8
-│   └── create-server.js # Factory serveur
 ├── src/
 │   ├── components/      # UI React
 │   ├── config/          # Constantes, modes proxy, fournisseurs
@@ -104,7 +85,6 @@ iptv-vod-player/
 │   ├── playback/        # Moteur de lecture (engine, HLS, MP4)
 │   ├── services/        # Re-exports rétrocompatibles
 │   └── utils/           # Utilitaires purs (proxyUrl, streamFormat)
-├── stream-proxy.mjs     # Point d'entrée proxy local
 ├── docs/
 └── package.json
 ```

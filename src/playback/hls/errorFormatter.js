@@ -10,7 +10,7 @@ export function formatHlsFatalError(data) {
 
   if (rawFrag.includes("/hls/") && !rawFrag.includes("/proxy?url=")) {
     hint +=
-      " — rechargez la page après npm run proxy (correctif CDN en cours)";
+      " — rechargez la page après docker compose up (correctif CDN en cours)";
   }
 
   return `Erreur HLS : ${msg}${hint}.${frag}`;

@@ -1,6 +1,6 @@
-# Pourquoi le proxy local est nécessaire
+# Pourquoi le proxy est nécessaire
 
-Ce document explique le rôle du proxy (`stream-proxy.mjs`, `http://127.0.0.1:3080`) dans le lecteur polivalent, et pourquoi il est indispensable pour lire des flux IPTV en **MP4**, **M3U8 (HLS)** et, dans une moindre mesure, **MKV**.
+Ce document explique le rôle du proxy **allmovies-iptv-proxy** (`http://localhost:3210`) dans le lecteur, et pourquoi il est indispensable pour lire des flux IPTV en **MP4**, **M3U8 (HLS)** et, dans une moindre mesure, **MKV**.
 
 ## Contexte : le navigateur et les serveurs IPTV
 
@@ -8,17 +8,17 @@ Le lecteur s’exécute dans le navigateur (Chrome, Firefox, Edge, etc.). La pag
 
 Le navigateur applique des règles de sécurité strictes : une page locale n’a pas le droit de télécharger librement des fichiers sur un autre site sans accord explicite de ce site. C’est la politique **CORS**. En pratique, beaucoup de serveurs IPTV ne renvoient pas les en-têtes qui autorisent la page à lire le flux directement — la requête est bloquée avant même que la vidéo n’arrive.
 
-Le proxy est un petit serveur Node qui tourne sur votre machine, à côté du navigateur. Au lieu d’aller chercher la vidéo sur Internet, le navigateur demande tout au proxy local ; c’est le proxy qui contacte le serveur IPTV, suit les redirections, gère le HTTPS parfois capricieux, et renvoie les données au lecteur en ajoutant les en-têtes qui autorisent la lecture (`Access-Control-Allow-Origin`).
+Le proxy allmovies tourne sur votre machine (Docker). Au lieu d’aller chercher la vidéo sur Internet, le navigateur demande tout au proxy ; c’est le proxy qui contacte le serveur IPTV, suit les redirections, gère le HTTPS parfois capricieux, et renvoie les données au lecteur en ajoutant les en-têtes qui autorisent la lecture (`Access-Control-Allow-Origin`).
 
 Pour le navigateur, la source ressemble à une ressource locale de confiance, alors que derrière le proxy continue de parler au vrai fournisseur de flux.
 
 **Démarrage :**
 
 ```bash
-npm run proxy
+cd ../allmovies-iptv-proxy && docker compose up
 ```
 
-Dans l’interface, laissez **Via proxy local** coché (`http://127.0.0.1:3080`).
+Dans l’interface, laissez **Via proxy** coché (`http://localhost:3210`).
 
 ---
 
@@ -46,11 +46,11 @@ C’est là que le proxy devient vraiment indispensable, pas seulement utile.
 
 1. **CORS** — chaque segment aurait le même problème qu’un MP4 direct.
 2. **Redirections et CDN** — les flux IPTV passent souvent par une chaîne : URL sur un hôte « line », redirections vers un CDN HTTPS, chemins relatifs du type `/hls/...` qui ne veulent rien dire sans le bon serveur en tête.
-3. **Réécriture des playlists** — le proxy ne se contente pas de relayer : il modifie le contenu des fichiers m3u8 pour que chaque ligne pointe à nouveau vers `http://127.0.0.1:3080/proxy?url=...`, mémorise quel CDN utiliser après les redirections, et peut relayer les segments même quand la playlist ne donne qu’un chemin court.
+3. **Réécriture des playlists** — le proxy ne se contente pas de relayer : il modifie le contenu des fichiers m3u8 pour que chaque ligne pointe à nouveau vers le proxy (`/proxy?url=...` ou routes fournisseur), mémorise quel CDN utiliser après les redirections, et peut relayer les segments même quand la playlist ne donne qu’un chemin court.
 
 Sans cette réécriture, hls.js chargerait la première playlist via le proxy puis tenterait d’aller chercher les morceaux ailleurs — et tout s’arrêterait au deuxième segment.
 
-Pour ce projet : **M3U8 = hls.js + proxy**.
+Pour ce projet : **M3U8 = hls.js + proxy allmovies**.
 
 ---
 
@@ -74,29 +74,23 @@ Pour tester de la VOD IPTV dans le navigateur, **MP4** ou **M3U8** restent les f
 | **M3U8** | Idem, plus réécriture des playlists et relais de tous les segments HLS (sinon la chaîne se casse après la première requête). |
 | **MKV** | Peut aider à **récupérer** le fichier ; ne résout pas l’absence de support codec dans le navigateur. |
 
-En une phrase : le proxy n’est pas un luxe pour accélérer le flux — c’est le pont entre les règles du navigateur et la réalité des serveurs IPTV (autres domaines, redirections, playlists découpées). Pour **MP4** et surtout **M3U8** dans ce projet, lancer `npm run proxy` en parallèle de la page web n’est pas optionnel : c’est ce qui permet au lecteur de voir le flux comme s’il venait de chez vous, tout en parlant au vrai serveur côté Node.
+En une phrase : le proxy n’est pas un luxe pour accélérer le flux — c’est le pont entre les règles du navigateur et la réalité des serveurs IPTV (autres domaines, redirections, playlists découpées). Pour **MP4** et surtout **M3U8** dans ce projet, lancer allmovies (`docker compose up`) en parallèle de la page web n’est pas optionnel : c’est ce qui permet au lecteur de voir le flux comme s’il venait de chez vous, tout en parlant au vrai serveur côté proxy.
 
 ---
 
 ## Modes proxy dans le lecteur
 
-### Proxy local (`stream-proxy.mjs`, port 3080)
+### Allmovies générique (port 3210)
 
-Comportement d’origine : `GET /proxy?url=...`, réécriture m3u8, relais `/hls/...`.
-
-```bash
-npm run proxy
-```
-
-### Allmovies générique (`allmovies-iptv-proxy`, port 3210)
-
-Même API `/proxy?url=...` exposée par le handler générique (`GENERIC_PROXY_ENABLED=true`). Les segments de secours passent par `/passthrough/hls/*` pour ne pas entrer en conflit avec les routes fournisseur `/hls/{slug}/...`.
+API `GET /proxy?url=...`, réécriture m3u8, relais `/passthrough/hls/*` pour les segments de secours.
 
 ```bash
 cd ../allmovies-iptv-proxy && docker compose up
 ```
 
 Dans le lecteur : mode **Allmovies générique (3210)**, base `http://localhost:3210`.
+
+Prérequis : `GENERIC_PROXY_ENABLED=true` dans le `.env` allmovies.
 
 ### Allmovies fournisseur (port 3210)
 
@@ -113,9 +107,8 @@ La découverte CDN côté navigateur est **désactivée** dans ce mode : le prox
 
 ## Fichiers liés
 
-- `stream-proxy.mjs` — proxy autonome (mode local)
-- `../allmovies-iptv-proxy/proxy/lib/handlers/generic-url-handler.js` — passthrough générique pour le mode Allmovies
+- `../allmovies-iptv-proxy/proxy/lib/handlers/generic-url-handler.js` — passthrough générique
 - `src/config/providers.js` — miroir des fournisseurs admin
-- `src/utils/iptvUrlParser.js` — conversion URL IPTV → route fournisseur
+- `src/proxy/parsers/iptvUrlParser.js` — conversion URL IPTV → route fournisseur
 - `src/` — application React ; sélecteur de mode proxy et hls.js
 - `README.md` — démarrage rapide

@@ -1,11 +1,10 @@
 {
   "name": "iptv-vod-player",
   "version": "1.0.0",
-  "description": "Lecteur IPTV React (MP4, M3U8/HLS) avec proxy local",
+  "description": "Lecteur IPTV React (MP4, M3U8/HLS) via proxy allmovies",
   "type": "module",
   "private": true,
   "scripts": {
-    "proxy": "node stream-proxy.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

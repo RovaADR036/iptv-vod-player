@@ -8,7 +8,7 @@ import { DEFAULT_PROVIDER_SLUG } from "../config/providers.js";
 
 export function useProxySettings() {
   const [useProxy, setUseProxy] = useState(true);
-  const [proxyMode, setProxyMode] = useState(PROXY_MODE.LOCAL);
+  const [proxyMode, setProxyMode] = useState(PROXY_MODE.ALLMOVIES_GENERIC);
   const [proxyBase, setProxyBase] = useState(DEFAULT_PROXY_BASE);
   const [providerSlug, setProviderSlug] = useState(DEFAULT_PROVIDER_SLUG);
 
